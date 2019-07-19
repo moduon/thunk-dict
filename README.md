@@ -63,7 +63,7 @@ pip install lazy_dict
 
 From source distribution
 ```bash
-git clone XXX
-cd XXX
+git clone https://github.com/kevalii/thunk-dict.git
+cd https://github.com/kevalii/thunk-dict.git
 pip install .
 ```
