@@ -1,2 +1,4 @@
 virt/
 .tox/
+build/
+thunk_dict.egg-info/

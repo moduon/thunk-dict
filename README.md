@@ -52,8 +52,6 @@ For noncallable entries, thunk-dict works just like a regular dict. thunk-dict a
 2. Works for any objects that register with dict
 3. Very low overhead
 
-## Benchmarks
-
 ## Installation
 
 From PyPi

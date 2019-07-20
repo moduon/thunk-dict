@@ -1,5 +1,4 @@
-import os
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(
@@ -14,6 +13,9 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
+        'Intended Audience :: Developers',
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: MIT License'
     ],
 
 )
