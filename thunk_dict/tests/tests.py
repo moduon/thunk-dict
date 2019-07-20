@@ -39,6 +39,42 @@ class TestInit(unittest.TestCase):
             return True
 
 
+class TestDictMethods(unittest.TestCase):
+    def test(self):
+        pass
+
+    def test_keys(self):
+        test_dict = ThunkDict(test_constants.TEST_DICT)
+        self.assertEqual(test_dict.keys(),
+                         list(test_constants.TEST_DICT.keys()))
+
+    def test_items(self):
+        test_dict = ThunkDict(test_constants.TEST_DICT)
+        self.assertEqual(test_dict.items(), list(
+            test_constants.TEST_DICT.items()))
+
+    def test_values(self):
+        test_dict = ThunkDict(test_constants.TEST_DICT)
+        self.assertEqual(test_dict.values(), list(
+            test_constants.TEST_DICT.values()))
+
+    def test_get(self):
+        test_dict = ThunkDict(test_constants.TEST_DICT)
+        self.assertEqual(test_dict.get("key1", None),
+                         test_constants.TEST_DICT.get("key1"))
+        self.assertEqual(test_dict.get("nonexistent_key", None), None)
+
+    def test_fromkeys(self):
+        keys = ("key1", "key2", "key3")
+        test_dict = ThunkDict.fromkeys(keys, 1)
+        self.assertEqual(test_dict.get_dict(), dict.fromkeys(keys, 1))
+
+    def test_clear(self):
+        test_dict = ThunkDict(test_constants.TEST_DICT)
+        test_dict.clear()
+        self.assertEqual(test_dict.get_dict(), {})
+
+
 class TestThunkInit(unittest.TestCase):
     def test(self):
         test_dict = ThunkDict()

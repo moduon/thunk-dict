@@ -47,7 +47,7 @@ class ThunkDict(collections.abc.MutableMapping):
         return ThunkDict(dictionary)
 
     def keys(self):
-        return self.__dictionary__.keys()
+        return list(self.__dictionary__.keys())
 
     def __dethunk__(self, item):
         if isinstance(item, self.__LazyInternal__):
