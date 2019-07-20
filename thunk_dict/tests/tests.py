@@ -39,6 +39,21 @@ class TestInit(unittest.TestCase):
             return True
 
 
+class TestThunkInit(unittest.TestCase):
+    def test(self):
+        test_dict = ThunkDict()
+        thunk = test_dict.__lazy__wrapper__(test_constants.calling_function)
+        self.assertIsInstance(thunk, test_dict.__LazyInternal__)
+
+
+class TestDethunk(unittest.TestCase):
+    def test(self):
+        test_dict = ThunkDict()
+        thunk = test_dict.__lazy__wrapper__(test_constants.calling_function)
+        dethunked = test_dict.__dethunk__(thunk)
+        self.assertEqual(dethunked, test_constants.additional_callback)
+
+
 class TestGet(unittest.TestCase):
     def test(self):
         test_dict = ThunkDict(dictionary=test_constants.TEST_DICT)
