@@ -26,6 +26,9 @@ class ThunkDict(collections.abc.MutableMapping):
 
         self.__dictionary__.update(*args, **kwargs)
 
+        self.__dictionary__ = {key: self.__thunk__(
+            self.__dictionary__[key]) for key in self.__dictionary__}
+
     def get(self, key, fallback=None):
         if key in self:
             return self[key]
@@ -49,6 +52,11 @@ class ThunkDict(collections.abc.MutableMapping):
     def keys(self):
         return list(self.__dictionary__.keys())
 
+    def __thunk__(self, item):
+        if callable(item):
+            return self.__lazy__wrapper__(item)
+        return item
+
     def __dethunk__(self, item):
         if isinstance(item, self.__LazyInternal__):
             return item.release()
@@ -70,8 +78,7 @@ class ThunkDict(collections.abc.MutableMapping):
         return self.__dictionary__[key]
 
     def __setitem__(self, attr, item):
-        self.__dictionary__[attr] = \
-            self.__lazy__wrapper__(item) if callable(item) else item
+        self.__dictionary__[attr] = self.__thunk__(item)
         return True
 
     def __delitem__(self, key):

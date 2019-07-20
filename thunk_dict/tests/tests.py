@@ -4,23 +4,18 @@ import logging
 import thunk_dict.tests.test_constants as test_constants
 from thunk_dict.ThunkDict import ThunkDict
 
-logger = logging.getLogger("tests")
-logger.setLevel("ERROR")
-
 
 class TestInit(unittest.TestCase):
     def test(self):
         self.assertTrue(self.regular_init())
         self.assertTrue(self.dictlike_init())
-        self.assertTrue(self.bad_init())
+        self.bad_init()
 
     def regular_init(self):
         try:
             test_dict = ThunkDict(dictionary=test_constants.TEST_DICT)
             return True
         except BaseException as e:
-            logger.error(
-                "TestInit.regular_init failed with exception:\n {}".format(e))
             return False
 
     def dictlike_init(self):
@@ -31,18 +26,11 @@ class TestInit(unittest.TestCase):
         return True
 
     def bad_init(self):
-        try:
+        with self.assertRaises(TypeError):
             test_dict = ThunkDict("not a dictionary")
-            logger.error("TestInit.bad_init failed to raise TypeError.")
-            return False
-        except TypeError:
-            return True
 
 
 class TestDictMethods(unittest.TestCase):
-    def test(self):
-        pass
-
     def test_keys(self):
         test_dict = ThunkDict(test_constants.TEST_DICT)
         self.assertEqual(test_dict.keys(),
@@ -50,13 +38,17 @@ class TestDictMethods(unittest.TestCase):
 
     def test_items(self):
         test_dict = ThunkDict(test_constants.TEST_DICT)
+        called_dict = {"key1": test_constants.TEST_DICT["key1"],
+                       "key2": test_constants.TEST_DICT["key2"]()}
         self.assertEqual(test_dict.items(), list(
-            test_constants.TEST_DICT.items()))
+            called_dict.items()))
 
     def test_values(self):
         test_dict = ThunkDict(test_constants.TEST_DICT)
+        called_dict = {"key1": test_constants.TEST_DICT["key1"],
+                       "key2": test_constants.TEST_DICT["key2"]()}
         self.assertEqual(test_dict.values(), list(
-            test_constants.TEST_DICT.values()))
+            called_dict.values()))
 
     def test_get(self):
         test_dict = ThunkDict(test_constants.TEST_DICT)
@@ -90,27 +82,29 @@ class TestDethunk(unittest.TestCase):
         self.assertEqual(dethunked, test_constants.additional_callback)
 
 
-class TestGet(unittest.TestCase):
-    def test(self):
+class TestInitAndGet(unittest.TestCase):
+    def test_no_thunkable_init(self):
         test_dict = ThunkDict(dictionary=test_constants.TEST_DICT)
         self.assertEqual(test_dict["key1"], test_constants.TEST_DICT["key1"])
-        self.assertEqual(test_dict["key2"], test_constants.TEST_DICT["key2"])
-        return True
+        self.assertEqual(test_dict["key2"], test_constants.TEST_DICT["key2"]())
+
+    def test_thunkable_init(self):
+        test_dict = ThunkDict(
+            dictionary={"key1": test_constants.calling_function})
+        self.assertEqual(test_dict["key1"], test_constants.additional_callback)
+        # Ensure that double access does not accidently call additional_callback
+        self.assertEqual(test_dict["key1"],
+                         test_constants.additional_callback)
 
 
 class TestSetAndGet(unittest.TestCase):
-    def test(self):
-        self.get_item()
-        self.set_and_get_nonwrappable()
-        self.set_and_get_wrappable()
-
-    def get_item(self):
+    def test_get_item(self):
         test_dict = ThunkDict(dictionary=test_constants.TEST_DICT)
 
         self.assertEqual(test_dict["key1"], test_constants.TEST_DICT["key1"])
-        self.assertEqual(test_dict["key2"], test_constants.TEST_DICT["key2"])
+        self.assertEqual(test_dict["key2"], test_constants.TEST_DICT["key2"]())
 
-    def set_and_get_nonwrappable(self):
+    def test_set_and_get_nonwrappable(self):
         test_dict = ThunkDict()
         test_dict["key1"] = test_constants.TEST_DICT["key1"]
 
@@ -118,7 +112,7 @@ class TestSetAndGet(unittest.TestCase):
             test_dict.__dictionary__["key1"], ThunkDict.__LazyInternal__)
         self.assertEqual(test_dict["key1"], test_constants.TEST_DICT["key1"])
 
-    def set_and_get_wrappable(self):
+    def test_set_and_get_wrappable(self):
         test_dict = ThunkDict()
         test_dict["key1"] = test_constants.calling_function
 
@@ -127,7 +121,3 @@ class TestSetAndGet(unittest.TestCase):
         # Ensure that double access does not accidently call additional_callback
         self.assertEqual(test_dict["key1"],
                          test_constants.additional_callback)
-
-
-if __name__ == "__main__":
-    unittest.main()
