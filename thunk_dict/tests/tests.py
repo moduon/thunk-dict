@@ -29,6 +29,14 @@ class TestInit(unittest.TestCase):
         with self.assertRaises(TypeError):
             test_dict = ThunkDict("not a dictionary")
 
+    def test_init_with_dict_comprehension(self):
+        test_dict = ThunkDict({
+            num: lambda _num=num: _num * 10 for num in range(3)
+        })
+        self.assertEqual(test_dict[0], 0)
+        self.assertEqual(test_dict[1], 10)
+        self.assertEqual(test_dict[2], 20)
+
 
 class TestDictMethods(unittest.TestCase):
     def test_keys(self):
@@ -70,14 +78,14 @@ class TestDictMethods(unittest.TestCase):
 class TestThunkInit(unittest.TestCase):
     def test(self):
         test_dict = ThunkDict()
-        thunk = test_dict.__lazy__wrapper__(test_constants.calling_function)
+        thunk = test_dict.__LazyInternal__(test_constants.calling_function)
         self.assertIsInstance(thunk, test_dict.__LazyInternal__)
 
 
 class TestDethunk(unittest.TestCase):
     def test(self):
         test_dict = ThunkDict()
-        thunk = test_dict.__lazy__wrapper__(test_constants.calling_function)
+        thunk = test_dict.__LazyInternal__(test_constants.calling_function)
         dethunked = test_dict.__dethunk__(thunk)
         self.assertEqual(dethunked, test_constants.additional_callback)
 
@@ -121,3 +129,6 @@ class TestSetAndGet(unittest.TestCase):
         # Ensure that double access does not accidently call additional_callback
         self.assertEqual(test_dict["key1"],
                          test_constants.additional_callback)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -9,12 +9,10 @@ class ThunkDict(collections.abc.MutableMapping):
         def release(self):
             return self.value()
 
-        def __call__(self, item):
+        def __init__(self, item):
             self.value = item
-            return self
 
     def __init__(self, dictionary=None, *args, **kwargs):
-        self.__lazy__wrapper__ = self.__LazyInternal__()
         self.__dictionary__ = None
 
         if isinstance(dictionary, dict):
@@ -54,7 +52,7 @@ class ThunkDict(collections.abc.MutableMapping):
 
     def __thunk__(self, item):
         if callable(item):
-            return self.__lazy__wrapper__(item)
+            return self.__LazyInternal__(item)
         return item
 
     def __dethunk__(self, item):
